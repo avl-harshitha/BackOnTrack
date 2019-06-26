@@ -20,6 +20,7 @@ function update_options(domain, url) {
   else
     blockedSitesList = JSON.parse(localStorage.blockedSites)
   blockedSitesList.push(domain)
+  localStorage[domain] = 0
   localStorage.blockedSites =  JSON.stringify(blockedSitesList)
 }
 

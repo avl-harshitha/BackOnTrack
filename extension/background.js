@@ -2,6 +2,9 @@
 if (!localStorage.sites) {
   localStorage.sites = JSON.stringify({});
 }
+if (!localStorage.blockedSites) {
+  localStorage.blockedSites = JSON.stringify({});
+}
 if(!localStorage.currentSite)
 localStorage.currentSite = null;
 if(!localStorage.startTime)
@@ -77,19 +80,65 @@ function getSiteFromUrl(url) {
 
 
 function updateTime() {
+  updateFilters()
   if (!localStorage.currentSite || !localStorage.startTime) {
+    return;
+  }
+  var curr_url = localStorage.currentSite
+  if(!isBlockedSite(curr_url)) {
     return;
   }
   var currTime = Date.parse(new Date())
   var startTime = Date.parse(localStorage.startTime)
-  var delta = currTime - startTime
+  var delta = (currTime - startTime) / 1000
   console.log("Site: " + localStorage.currentSite + " Delta = " + delta);
-  var curr_url = localStorage.currentSite
+  
+  
   if (!localStorage[curr_url]) {
-    localStorage[curr_url] = 0;
+    localStorage[curr_url] = parseInt(delta);
   }
   else{
   localStorage[curr_url] = parseInt(localStorage[curr_url]) + parseInt(delta);
   }
 
 };
+
+
+function isBlockedSite(url) {
+  var blockedSitesList = JSON.parse(localStorage.blockedSites);
+  for (i = 0; i <blockedSitesList.length; i++) {
+    // console.log(blockedSitesList[i])
+    if (url.localeCompare(blockedSitesList[i]) == 0) {
+      console.log("blocked site")
+      return true;
+    }
+  }
+  return false;
+}
+
+function blockRequest(details) {
+  return {cancel:true}
+}
+
+function updateFilters() {
+  // var url_links = getRegex(JSON.parse(localStorage.blockedSites))
+  if(chrome.webRequest.onBeforeRequest.hasListener(blockRequest))
+    chrome.webRequest.onBeforeRequest.removeListener(blockRequest);
+  chrome.webRequest.onBeforeRequest.addListener(blockRequest, {urls: getRegex(JSON.parse(localStorage.blockedSites))}, ['blocking']);
+}
+
+function getRegex(siteList) {
+  regexList = []
+  for(i = 0; i < siteList.length; i ++) {
+      var site = siteList[i]
+      // console.log("time spent" + localStorage[site])
+      if(parseInt(localStorage[site]) > 20){
+        regexList.push("*://*." + siteList[i] + "/*")
+        console.log("time spent" + localStorage[site])
+      }
+  }
+  return regexList
+}
+
+// updateFilters()
+
