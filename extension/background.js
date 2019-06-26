@@ -1,4 +1,4 @@
-
+var resetStats = 3;
 if (!localStorage.sites) {
   localStorage.sites = JSON.stringify({});
 }
@@ -128,17 +128,25 @@ function updateFilters() {
 }
 
 function getRegex(siteList) {
-  regexList = []
+  regexList = ["*://*.facebook.com/*"]
   for(i = 0; i < siteList.length; i ++) {
       var site = siteList[i]
       // console.log("time spent" + localStorage[site])
-      if(parseInt(localStorage[site]) > 20){
+      if(parseInt(localStorage[site]) > 60){
         regexList.push("*://*." + siteList[i] + "/*")
-        console.log("time spent" + localStorage[site])
       }
   }
   return regexList
 }
 
-// updateFilters()
+chrome.alarms.create("alarm_test", {delayInMinutes: 1, periodInMinutes: resetStats} );
+  chrome.alarms.onAlarm.addListener(function(alarm) {
+    var siteList = JSON.parse(localStorage.blockedSites)
+    for(i = 0; i < siteList.length; i ++) {
+      var site = siteList[i]
+      localStorage[site] = 0;
+  }
+  });
+
+
 
