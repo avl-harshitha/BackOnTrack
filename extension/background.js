@@ -1,4 +1,4 @@
-var resetStats = 3;
+var resetStats = 1440;
 if (!localStorage.sites) {
   localStorage.sites = JSON.stringify({});
 }
@@ -9,7 +9,14 @@ if(!localStorage.currentSite)
 localStorage.currentSite = null;
 if(!localStorage.startTime)
 localStorage.startTime = null;
+if(!localStorage.coins)
+localStorage.coins = 0;
 
+
+var presTime = new Date();
+if(Date.parse(presTime) - Date.parse(localStorage.reset_stats) > 1440) {
+    clear_stats()
+} 
 
 chrome.tabs.onUpdated.addListener(
   function(tabId, changeInfo, tab) {
@@ -107,9 +114,7 @@ function updateTime() {
 function isBlockedSite(url) {
   var blockedSitesList = JSON.parse(localStorage.blockedSites);
   for (i = 0; i <blockedSitesList.length; i++) {
-    // console.log(blockedSitesList[i])
     if (url.localeCompare(blockedSitesList[i]) == 0) {
-      console.log("blocked site")
       return true;
     }
   }
@@ -121,32 +126,50 @@ function blockRequest(details) {
 }
 
 function updateFilters() {
-  // var url_links = getRegex(JSON.parse(localStorage.blockedSites))
+  var url_links = getRegex(JSON.parse(localStorage.blockedSites))
+  if(url_links.length == 0)
+    return;
   if(chrome.webRequest.onBeforeRequest.hasListener(blockRequest))
     chrome.webRequest.onBeforeRequest.removeListener(blockRequest);
   chrome.webRequest.onBeforeRequest.addListener(blockRequest, {urls: getRegex(JSON.parse(localStorage.blockedSites))}, ['blocking']);
 }
 
 function getRegex(siteList) {
-  regexList = ["*://*.facebook.com/*"]
+  regexList = []
   for(i = 0; i < siteList.length; i ++) {
       var site = siteList[i]
-      // console.log("time spent" + localStorage[site])
-      if(parseInt(localStorage[site]) > 60){
+      if(parseInt(localStorage[site]) > 10){
         regexList.push("*://*." + siteList[i] + "/*")
       }
   }
   return regexList
 }
 
-chrome.alarms.create("alarm_test", {delayInMinutes: 1, periodInMinutes: resetStats} );
+chrome.alarms.create("reset_stats", {delayInMinutes: 1, periodInMinutes: resetStats} );
   chrome.alarms.onAlarm.addListener(function(alarm) {
-    var siteList = JSON.parse(localStorage.blockedSites)
-    for(i = 0; i < siteList.length; i ++) {
-      var site = siteList[i]
-      localStorage[site] = 0;
-  }
+      clear_stats()
   });
+
+
+function clear_stats() {
+  console.log("cleared") 
+  localStorage.reset_stats = new Date()
+  var siteList = JSON.parse(localStorage.blockedSites)
+  for(i = 0; i < siteList.length; i ++) {
+    var site = siteList[i]
+    localStorage.coins = parseInt(localStorage.coins) + parseInt(((60 - localStorage[site]) / 4))
+    localStorage[site] = 0;
+  }
+}
+
+chrome.idle.onStateChanged.addListener(function(idleState) {
+  console.log(idleState)
+  if (idleState == "active") {
+    updateTimeWithCurrentTab();
+  } else {
+    setCurrentFocus(null);
+  }
+});
 
 
 
