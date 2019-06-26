@@ -1,8 +1,9 @@
 {
-    "name": "Getting Started Example",
+    "name": "BackOnTrack",
     "version": "1.0",
-    "description": "Build an Extension!",
-    "permissions": ["activeTab", 
+    "description": "Blocks websites!",
+    "permissions": ["activeTab",
+      "tabs", 
       "declarativeContent",
        "storage",
         "webRequest",
@@ -12,10 +13,10 @@
      "https://*/*"
       ],
     "background": {
-      "scripts": ["background.js"],
+      "scripts": ["background.js" ],
       "persistent": true
     },
-    "options_page": "options.html",
+    "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
     "page_action": {
       "default_popup": "popup.html",
       "default_icon": {
@@ -24,6 +25,10 @@
         "48": "images/get_started48.png",
         "128": "images/get_started128.png"
       }
+    },
+    "options_ui": {
+      "page": "options.html",
+      "open_in_tab": true
     },
     "icons": {
       "16": "images/get_started16.png",
