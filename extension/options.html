@@ -1,13 +1,36 @@
 <!DOCTYPE html>
 <html>
-<head><title>Extension Options</title></head>
+<head>
+    <title>Extension Options</title>
+    <style>
+    button {
+        padding: 10px 15px;
+        font-size: 14px;
+        text-align: center;
+        cursor: pointer;
+        outline: none;
+        color: #fff;
+        background-color:red;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 3px #999;
+      }
+      button:hover {background-color: darkred}
+      
+      button:active {
+        background-color:red;
+        box-shadow: 0 5px #666;
+        transform: translateY(4px);
+      }
+      </style>
+</head>
 <body>
 <center>
-<h4>Enter the URL to be blocked</h4>
-<input type="text" id ="urltext" >
+<p style="font-size:24px;"> Enter the URL to be blocked</p>
+<input type="text" id ="urltext" style="font-size:18px;">
 
 <br><br><br><br>
-<div id="status"></div>
+<div id="status" style="font-size:14px;"></div>
 
 <button id="save">BLOCK</button>
 </center>

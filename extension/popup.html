@@ -3,21 +3,45 @@
   <head>
     <style>
       body {
-      min-width: 150px; /* your desired width */
+      min-width: 200px; /* your desired width */
       max-width: 100%;
+      margin: 0; /* Space from this element (entire page) and others*/
+    padding: 20; 
       position: relative;
       vertical-align:middle;
+      /* background-color:  #ffefc7 */
+      background-color: #faf3e3;
+      border-radius: 5px;
+      border-style: groove;
+      border-width: medium;
+      /* background-color:#ebeced */
     }
-      button {
-        height: 20px;
-        width: 70px;
-        outline: none;
-      }
+    button {
+  padding: 5px 15px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: green;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 3px #999;
+}
+button:hover {background-color: darkgreen}
+
+button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
     </style>
   </head>
   <body>
     <center>
-    <p id="coins">coins</p>
+      <img id="icon" src = "images/coins.png" width = "70px" height="70px">
+    <p id="coins" style="font-size:14px;">coins</p>
+    <p id="time" style="font-size:14px;"></p>
     <button id="redeem">REDEEM</button>
     <script src="popup.js"></script>
     </center>

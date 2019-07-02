@@ -1,22 +1,19 @@
 var resetStats = 1440;
-if (!localStorage.sites) {
-  localStorage.sites = JSON.stringify({});
-}
-if (!localStorage.blockedSites) {
-  localStorage.blockedSites = JSON.stringify({});
-}
+var dailyLimit = 60;
+var part = 4;
+
+console.log("loaded")
+
 if(!localStorage.currentSite)
 localStorage.currentSite = null;
 if(!localStorage.startTime)
 localStorage.startTime = null;
-if(!localStorage.coins)
-localStorage.coins = 0;
 
 
-var presTime = new Date();
-if(Date.parse(presTime) - Date.parse(localStorage.reset_stats) > 1440) {
-    clear_stats()
-} 
+
+if(!isStatsCleared())
+  clear_stats()
+ 
 
 chrome.tabs.onUpdated.addListener(
   function(tabId, changeInfo, tab) {
@@ -97,9 +94,7 @@ function updateTime() {
   }
   var currTime = Date.parse(new Date())
   var startTime = Date.parse(localStorage.startTime)
-  var delta = (currTime - startTime) / 1000
-  console.log("Site: " + localStorage.currentSite + " Delta = " + delta);
-  
+  var delta = (currTime - startTime) / (1000 *  60)
   
   if (!localStorage[curr_url]) {
     localStorage[curr_url] = parseInt(delta);
@@ -126,11 +121,15 @@ function blockRequest(details) {
 }
 
 function updateFilters() {
-  var url_links = getRegex(JSON.parse(localStorage.blockedSites))
-  if(url_links.length == 0)
+
+  if(!localStorage.blockedSites)
     return;
+
+  var url_links = getRegex(JSON.parse(localStorage.blockedSites))
   if(chrome.webRequest.onBeforeRequest.hasListener(blockRequest))
     chrome.webRequest.onBeforeRequest.removeListener(blockRequest);
+  if(url_links.length == 0)
+    return;
   chrome.webRequest.onBeforeRequest.addListener(blockRequest, {urls: getRegex(JSON.parse(localStorage.blockedSites))}, ['blocking']);
 }
 
@@ -138,29 +137,43 @@ function getRegex(siteList) {
   regexList = []
   for(i = 0; i < siteList.length; i ++) {
       var site = siteList[i]
-      if(parseInt(localStorage[site]) > 10){
+      if(parseInt(localStorage[site]) >= dailyLimit){
         regexList.push("*://*." + siteList[i] + "/*")
       }
   }
   return regexList
 }
 
-chrome.alarms.create("reset_stats", {delayInMinutes: 1, periodInMinutes: resetStats} );
+chrome.alarms.create("reset_stats", { when: new Date().setUTCHours(0, 0, 0, 0), periodInMinutes: resetStats} );
   chrome.alarms.onAlarm.addListener(function(alarm) {
       clear_stats()
   });
 
+function isStatsCleared() {
+  var presTime = new Date();
+  var diff = Date.parse(presTime) - Date.parse(localStorage.reset_stats)
+  return diff < (resetStats * 60 * 1000)
+}
+
 
 function clear_stats() {
-  console.log("cleared") 
+  if(isStatsCleared()) {
+    return
+  }
   localStorage.reset_stats = new Date()
   var siteList = JSON.parse(localStorage.blockedSites)
   for(i = 0; i < siteList.length; i ++) {
     var site = siteList[i]
-    localStorage.coins = parseInt(localStorage.coins) + parseInt(((60 - localStorage[site]) / 4))
+    if(localStorage["coins"+site]==null)
+      localStorage["coins"+site] = 0;
+    var temp = parseInt(localStorage["coins"+site]) + parseInt((dailyLimit - parseInt(localStorage[site])) / part)
+    if(temp < 0)
+      temp = 0
+    localStorage["coins"+site] = temp
     localStorage[site] = 0;
   }
 }
+
 
 chrome.idle.onStateChanged.addListener(function(idleState) {
   console.log(idleState)

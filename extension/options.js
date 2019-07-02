@@ -1,34 +1,40 @@
 // Saves options to chrome.storage
-function display_storage(key) {
-  chrome.storage.local.get([key], function(result) {
-    console.log(JSON.stringify(result))
-  });
-}
 
-function update_status() {
+
+
+function update_status(msg) {
   var status = document.getElementById('status');
-  status.textContent = 'Options saved.';
+  status.textContent = msg;
   setTimeout(function() {
     status.textContent = '';
   }, 750);
 }
 
 function update_options(domain, url) {
-  var blockedSitesList;
+  var blockedSitesList = []
   if(!localStorage.blockedSites)
-    localStorage.blockedSites = JSON.stringify([])
-  else
+  {
+    localStorage.blockedSites = JSON.stringify([domain])
+  }
+  else{
     blockedSitesList = JSON.parse(localStorage.blockedSites)
-  blockedSitesList.push(domain)
+    blockedSitesList.push(domain)
+    localStorage.blockedSites =  JSON.stringify(blockedSitesList)
+  }
   localStorage[domain] = 0
-  localStorage.blockedSites =  JSON.stringify(blockedSitesList)
+  
 }
 
 function save_options() {
   var domain = document.getElementById('urltext').value
+  if(domain.localeCompare("") == 0 || domain == null){
+    update_status("Please enter a URL");
+    return;
+  }
+  domain = domain.replace('http://','').replace('www.','').replace('https://','').split(/[/?#]/)[0];  
   var url = {};
   update_options(domain, url);
-  update_status();
+  update_status("Options saved");
   restore_options();
 }
 
