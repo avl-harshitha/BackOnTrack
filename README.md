@@ -1,5 +1,7 @@
 # BackOnTrack
 
+This extension is on the chrome web store and in the process of manual review
+
 #### Project name - BackOnTrack
 Chrome extension to block websites and control time usage on web
 
