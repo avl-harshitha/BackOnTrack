@@ -1,6 +1,7 @@
 # BackOnTrack
 
-This extension is on the chrome web store and in the process of manual review
+This extension is on the chrome web store
+https://chrome.google.com/webstore/detail/backontrack/fbihalnkmmbkdcdojiabbakjokmfbdkp
 
 #### Project name - BackOnTrack
 Chrome extension to block websites and control time usage on web
@@ -12,12 +13,6 @@ A.V.L.Harshitha
 - Block websites based on usage limit or a block of time
 - Redeem part of time not used in the week
 
-#### Steps to download :-
-- Download the extension and unzip it
-- Open extensions in Chrome under more tools
-- Switch on developer mode
-- Load unpacked extension i.e BackOnTrack master-> extension
-- Go to Details -> extension options to specify websites to block
 
 #### Potential users :-
 - Students
